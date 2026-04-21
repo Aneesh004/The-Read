@@ -1,0 +1,166 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id              String    @id @default(cuid())
+  name            String
+  username        String?   @unique
+  email           String    @unique
+  password        String?   // null if social login
+  avatar          String?
+  bio             String?   
+  favoriteGenres  String?   // comma-separated due to sqlite limit
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  ratings         Rating[]
+  comments        Comment[]
+  commentLikes    CommentLike[]
+  clubMemberships ClubMember[]
+  ownedClubs      Club[]      @relation("ClubOwner")
+  notifications   Notification[]
+}
+
+model Book {
+  id            String    @id @default(cuid())
+  googleBooksId String?   @unique
+  title         String
+  author        String
+  coverImage    String?
+  publishedYear Int?
+  summary       String?   
+  isbn          String?
+  genres        String?   // comma separated
+  buyLinks      String?   // stringified json due to sqlite limit
+  createdAt     DateTime  @default(now())
+  
+  ratings       Rating[]
+  comments      Comment[]
+}
+
+model Rating {
+  id        String   @id @default(cuid())
+  value     String   // "skip" | "okish" | "good_read" | "must_read"
+  userId    String
+  bookId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, bookId]) // One rating per user per book
+}
+
+model Comment {
+  id        String    @id @default(cuid())
+  text      String    
+  isSpoiler Boolean   @default(false)
+  userId    String
+  bookId    String
+  parentId  String?   // null = top-level, otherwise = reply
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book      Book      @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies   Comment[] @relation("CommentReplies")
+  likes     CommentLike[]
+}
+
+model CommentLike {
+  id        String   @id @default(cuid())
+  userId    String
+  commentId String
+  createdAt DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, commentId])
+}
+
+model Club {
+  id          String       @id @default(cuid())
+  name        String       @unique
+  description String?      
+  banner      String?
+  genres      String?
+  isPrivate   Boolean      @default(false)
+  maxMembers  Int          @default(100)
+  ownerId     String
+  currentBookId String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  
+  owner       User         @relation("ClubOwner", fields: [ownerId], references: [id])
+  members     ClubMember[]
+  posts       ClubPost[]
+  bookshelf   ClubBook[]
+}
+
+model ClubMember {
+  id        String   @id @default(cuid())
+  userId    String
+  clubId    String
+  role      String   @default("member") // "admin" | "member"
+  joinedAt  DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  club      Club     @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, clubId])
+}
+
+model ClubPost {
+  id        String        @id @default(cuid())
+  text      String        
+  isPinned  Boolean       @default(false)
+  userId    String
+  clubId    String
+  createdAt DateTime      @default(now())
+  
+  club      Club          @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  replies   ClubPostReply[]
+}
+
+model ClubPostReply {
+  id        String   @id @default(cuid())
+  text      String   
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+  
+  post      ClubPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model ClubBook {
+  id      String @id @default(cuid())
+  clubId  String
+  bookId  String
+  status  String @default("reading") // "reading" | "completed" | "suggested"
+  addedAt DateTime @default(now())
+  
+  club    Club   @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  
+  @@unique([clubId, bookId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  type      String   // "reply" | "like" | "club_invite" | "trending" | "club_activity"
+  message   String
+  link      String   // URL to navigate to
+  isRead    Boolean  @default(false)
+  userId    String
+  createdAt DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

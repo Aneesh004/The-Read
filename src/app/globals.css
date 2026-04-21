@@ -1,0 +1,77 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-secondary: var(--bg-secondary);
+  --color-bg-card: var(--bg-card);
+  --color-bg-hover: var(--bg-hover);
+  
+  --color-accent-gold: var(--accent-gold);
+  --color-accent-amber: var(--accent-amber);
+  --color-accent-rose: var(--accent-rose);
+  --color-accent-sage: var(--accent-sage);
+  --color-accent-lavender: var(--accent-lavender);
+  
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+
+  --font-playfair: var(--font-playfair);
+  --font-fraunces: var(--font-fraunces);
+  --font-serif: var(--font-source-serif);
+  --font-sans: var(--font-dm-sans);
+  --font-literata: var(--font-literata);
+}
+
+:root {
+  /* Core Palette */
+  --bg-primary: #0D0B0E;           /* Deep ink black */
+  --bg-secondary: #1A1620;         /* Dark plum */
+  --bg-card: #221E2A;              /* Elevated card surface */
+  --bg-hover: #2D2838;             /* Hover state */
+  
+  /* Accent Colors */
+  --accent-gold: #D4A853;          /* Warm gold — primary accent */
+  --accent-amber: #E8943A;         /* Rich amber — CTAs */
+  --accent-rose: #C45B6E;          /* Muted rose — love/heart actions */
+  --accent-sage: #7BA68C;          /* Sage green — success states */
+  --accent-lavender: #9B8EC4;      /* Soft lavender — community/social */
+  
+  /* Text */
+  --text-primary: #F5F0E8;         /* Warm cream */
+  --text-secondary: #A89F94;       /* Muted warm gray */
+  --text-muted: #6B6360;           /* Subtle text */
+}
+
+/* Since the prompt targets a dark theme by default, we apply directly to body */
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-source-serif), serif;
+  position: relative;
+  min-height: 100vh;
+}
+
+/* Texture overlay for paper grain */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Utilities not easily covered by single Tailwind v4 tokens just yet */
+@layer utilities {
+  .text-glow {
+    text-shadow: 0 0 10px rgba(212, 168, 83, 0.4);
+  }
+  .box-glow {
+    box-shadow: 0 0 60px rgba(212, 168, 83, 0.15);
+  }
+}
