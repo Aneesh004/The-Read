@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -18,17 +18,15 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
 
-    const res = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
+    const supabase = createClient();
+    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
 
-    if (res?.error) {
+    if (signInError) {
       setError("Invalid email or password.");
       setLoading(false);
     } else {
       router.push("/dashboard");
+      router.refresh();
     }
   };
 
@@ -48,8 +46,8 @@ export default function LoginPage() {
 
         <div>
           <label className="block font-sans text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Email</label>
-          <input 
-            type="email" 
+          <input
+            type="email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -65,8 +63,8 @@ export default function LoginPage() {
               Forgot password?
             </Link>
           </div>
-          <input 
-            type="password" 
+          <input
+            type="password"
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -75,8 +73,8 @@ export default function LoginPage() {
           />
         </div>
 
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           disabled={loading}
           className="w-full bg-accent-gold text-bg-primary font-sans font-bold py-3 rounded-lg hover:bg-accent-amber transition-colors disabled:opacity-50 flex justify-center items-center gap-2 mt-6"
         >
