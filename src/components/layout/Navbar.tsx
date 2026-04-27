@@ -17,8 +17,7 @@ export function Navbar() {
           <Link href="/" className="flex items-center space-x-2 group">
             <div className="text-accent-gold transition-transform group-hover:scale-110"> </div>
             <span className="font-playfair text-2xl font-bold tracking-wide text-text-primary group-hover:text-glow transition-all">
-              Readings & Rambles
-            </span>
+            Readings <span className="font-sans">&</span> Rambles </span>
           </Link>
 
           {/* Desktop Nav */}
@@ -33,7 +32,7 @@ export function Navbar() {
               Book Clubs
             </Link>
             <Link href="/search" className="text-sm font-sans font-medium text-text-secondary hover:text-accent-gold transition-colors flex items-center gap-2">
-              <Search size={16} /> Search
+              <Search size={16} /> 
             </Link>
           </nav>
 

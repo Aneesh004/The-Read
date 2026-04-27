@@ -26,9 +26,6 @@ export function LatestReleases() {
               Latest Releases
             </h2>
           </div>
-          <Link href="/search" className="text-sm font-sans font-bold text-accent-gold hover:text-accent-amber transition-colors uppercase tracking-widest hidden sm:block">
-            View All
-          </Link>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 gap-y-10">

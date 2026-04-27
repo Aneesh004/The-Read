@@ -55,7 +55,6 @@ export function TopPicksThisWeek() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         <div className="mb-16 flex items-center gap-4">
-          <BookOpen className="text-accent-gold opacity-50" size={32} />
           <h2 className="font-playfair text-4xl md:text-5xl font-bold text-text-primary">
             Top Picks This Week
           </h2>
