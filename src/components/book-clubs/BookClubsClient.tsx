@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Search, Users, PlusCircle, UserPlus, Lock, Unlock, X,
   CheckCircle, XCircle, ChevronLeft, Shield,
@@ -63,12 +64,6 @@ const INITIAL_CLUBS: Club[] = [
     genres: ["Mystery", "Thriller", "Horror"],
     members: 34,
     isPublic: false,
-    createdByCurrentUser: true,
-    applications: [
-      { id: 101, applicantName: "Aria Patel", applicantHandle: "@ariareads", reason: "I've been obsessed with locked-room mysteries since childhood. I would love a space to dissect them with fellow enthusiasts!", status: "pending" },
-      { id: 102, applicantName: "James Osei", applicantHandle: "@jamesbookish", reason: "Horror fiction is my comfort genre — I know that sounds odd — and I'd love to discuss tropes and themes with a dedicated group.", status: "pending" },
-      { id: 103, applicantName: "Lena Voronova", applicantHandle: "@lenavobooks", reason: "I just finished 'The Silent Patient' and need people to talk to about the ending. Please let me in!", status: "pending" },
-    ],
   },
   {
     id: 4,
@@ -83,8 +78,34 @@ const INITIAL_CLUBS: Club[] = [
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function BookClubsClient() {
-  const [view, setView] = useState<ViewState>("onboarding");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const viewParam = searchParams.get("view") as ViewState | null;
+
   const [clubs, setClubs] = useState<Club[]>(INITIAL_CLUBS);
+
+  const hasManagedClub = clubs.some((c) => c.createdByCurrentUser);
+
+  useEffect(() => {
+    // If the user visits the base route (/book-clubs) without a view parameter, 
+    // and they have an active managed club, auto-redirect to their dashboard.
+    // We use router.replace to prevent adding the base /book-clubs route to the history stack.
+    if (!viewParam && hasManagedClub) {
+      router.replace("/book-clubs?view=creatorDashboard");
+    }
+  }, [viewParam, hasManagedClub, router]);
+
+  const view: ViewState = viewParam && ["onboarding", "create", "join", "creatorDashboard"].includes(viewParam) 
+    ? viewParam 
+    : (hasManagedClub ? "creatorDashboard" : "onboarding");
+
+  const setView = (newView: ViewState) => {
+    if (newView === "onboarding") {
+      router.push("/book-clubs");
+    } else {
+      router.push(`/book-clubs?view=${newView}`);
+    }
+  };
 
   // Create Form State
   const [createName, setCreateName] = useState("");
@@ -160,40 +181,85 @@ export default function BookClubsClient() {
 
       {/* ── ONBOARDING ─────────────────────────────────────────────────────── */}
       {view === "onboarding" && (
-        <div className="space-y-6">
+        <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+          {/* Header Section */}
+          <div className="text-center space-y-4 max-w-3xl mx-auto pt-10">
+            <h1 className="font-playfair text-5xl md:text-6xl font-bold text-text-primary tracking-tight">
+              Find Your Tribe
+            </h1>
+            <p className="font-sans text-lg text-text-secondary leading-relaxed">
+              Whether you're looking to lead a new literary expedition or join an existing circle of avid readers, your community awaits.
+            </p>
+          </div>
+
           {/* If the user manages any clubs, show a creator dashboard shortcut */}
           {myManagedClubs.length > 0 && (
-            <div className="flex justify-end">
+            <div className="flex justify-center">
               <button
                 onClick={() => setView("creatorDashboard")}
-                className="flex items-center gap-2 px-5 py-2.5 bg-accent-gold/10 text-accent-gold border border-accent-gold/20 hover:bg-accent-gold/20 rounded-full font-sans text-sm font-medium transition-all"
+                className="flex items-center gap-2 px-6 py-3 bg-bg-card border border-accent-gold/20 text-accent-gold hover:bg-accent-gold/10 rounded-full font-sans text-sm font-medium transition-all shadow-lg shadow-accent-gold/5"
               >
                 <Shield size={16} /> My Creator Dashboard
               </button>
             </div>
           )}
 
-          <div className="flex flex-col md:flex-row gap-8 justify-center items-stretch max-w-4xl mx-auto mt-6 py-6">
+          {/* Cards Section */}
+          <div className="flex flex-col md:flex-row gap-8 justify-center items-stretch max-w-5xl mx-auto pb-16 px-4 sm:px-6 lg:px-8">
+            {/* Start a Book Club Card */}
             <button
               onClick={() => setView("create")}
-              className="flex-1 group bg-bg-card border border-white/10 hover:border-accent-gold/50 rounded-[2rem] p-10 flex flex-col items-center text-center transition-all hover:-translate-y-2 shadow-xl hover:shadow-accent-gold/20"
+              className="group relative flex-1 rounded-[2.5rem] overflow-hidden text-left transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-accent-gold/20 border border-white/5"
             >
-              <div className="w-20 h-20 bg-accent-gold/10 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <PlusCircle className="text-accent-gold" size={40} />
+              <div className="absolute inset-0">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img 
+                  src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=800&fit=crop" 
+                  alt="Start a Book Club" 
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20" />
               </div>
-              <h2 className="font-fraunces text-2xl text-text-primary mb-3">Start a Book Club</h2>
-              <p className="font-sans text-text-secondary">Create a new space for your friends or open it up for everyone to join.</p>
+              <div className="relative z-10 p-10 h-full flex flex-col justify-end min-h-[420px]">
+                <div className="w-16 h-16 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-accent-gold/20 group-hover:border-accent-gold/50 transition-all duration-500">
+                  <PlusCircle className="text-white group-hover:text-accent-gold transition-colors duration-500" size={32} />
+                </div>
+                <h2 className="font-playfair text-3xl md:text-4xl font-bold text-white mb-4">Host a Realm</h2>
+                <p className="font-sans text-white/80 text-lg leading-relaxed max-w-sm">
+                  Create a new sanctuary for your friends or open the doors for fellow enthusiasts to discover.
+                </p>
+                <div className="mt-8 flex items-center text-accent-gold font-sans font-semibold text-sm uppercase tracking-widest opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500">
+                  Start a Club <span className="ml-2">→</span>
+                </div>
+              </div>
             </button>
 
+            {/* Join a Book Club Card */}
             <button
               onClick={() => setView("join")}
-              className="flex-1 group bg-bg-card border border-white/10 hover:border-accent-gold/50 rounded-[2rem] p-10 flex flex-col items-center text-center transition-all hover:-translate-y-2 shadow-xl hover:shadow-accent-gold/20"
+              className="group relative flex-1 rounded-[2.5rem] overflow-hidden text-left transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-accent-gold/20 border border-white/5"
             >
-              <div className="w-20 h-20 bg-accent-gold/10 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <UserPlus className="text-accent-gold" size={40} />
+              <div className="absolute inset-0">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img 
+                  src="https://images.unsplash.com/photo-1511895426328-dc8714191300?q=80&w=800&fit=crop" 
+                  alt="Join a Book Club" 
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20" />
               </div>
-              <h2 className="font-fraunces text-2xl text-text-primary mb-3">Join a Book Club</h2>
-              <p className="font-sans text-text-secondary">Discover active communities reading the exact same genres you love.</p>
+              <div className="relative z-10 p-10 h-full flex flex-col justify-end min-h-[420px]">
+                <div className="w-16 h-16 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-accent-gold/20 group-hover:border-accent-gold/50 transition-all duration-500">
+                  <UserPlus className="text-white group-hover:text-accent-gold transition-colors duration-500" size={32} />
+                </div>
+                <h2 className="font-playfair text-3xl md:text-4xl font-bold text-white mb-4">Join a Fellowship</h2>
+                <p className="font-sans text-white/80 text-lg leading-relaxed max-w-sm">
+                  Discover vibrant, active communities dissecting the exact same genres you already love.
+                </p>
+                <div className="mt-8 flex items-center text-accent-gold font-sans font-semibold text-sm uppercase tracking-widest opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500">
+                  Find a Club <span className="ml-2">→</span>
+                </div>
+              </div>
             </button>
           </div>
         </div>

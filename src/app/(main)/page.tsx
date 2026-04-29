@@ -2,7 +2,8 @@ import { HeroSection } from "@/components/landing/HeroSection";
 import { LatestReleases } from "@/components/landing/LatestReleases";
 import { TopPicksThisWeek } from "@/components/landing/TopPicksThisWeek";
 import { HowItWorks } from "@/components/landing/HowItWorks";
-import { CommunitySpotlight } from "@/components/landing/CommunitySpotlight";
+import { HindiSahitya } from "@/components/landing/HindiSahitya";
+import { CompetitionMayhem } from "@/components/landing/CompetitionMayhem";
 
 
 export default function Home() {
@@ -12,8 +13,8 @@ export default function Home() {
       <HowItWorks />
       <LatestReleases />
       <TopPicksThisWeek />
-      <CommunitySpotlight />
-
+      <HindiSahitya />
+      <CompetitionMayhem />
     </>
   );
 }
