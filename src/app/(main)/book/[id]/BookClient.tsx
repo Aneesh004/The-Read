@@ -6,6 +6,7 @@ import { Loader2, BookOpen } from "lucide-react";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useRouter } from "next/navigation";
 import WishlistButton from "@/components/wishlist/WishlistButton";
+import BookComments from "@/components/book/BookComments";
 import type { OLBook } from "@/lib/open-library";
 
 interface BookClientProps {
@@ -314,6 +315,9 @@ export default function BookClient({ bookId }: BookClientProps) {
               </p>
             )}
           </div>
+
+          {/* Comments */}
+          <BookComments bookId={bookId} />
 
           {/* Community Verdict */}
           <div className="bg-bg-card/50 border border-white/10 rounded-2xl p-8 max-w-2xl relative overflow-hidden backdrop-blur-sm">

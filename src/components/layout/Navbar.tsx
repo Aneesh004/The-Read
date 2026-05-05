@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { BookOpen, Search, Menu, X, Bookmark, LogOut, LayoutDashboard } from "lucide-react";
+import { Search, Menu, X, LogOut, LayoutDashboard } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/components/providers/AuthProvider";
@@ -34,10 +34,7 @@ export function Navbar() {
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link href="/trending" className="text-sm font-sans font-medium text-text-secondary hover:text-accent-gold transition-colors">
-              Trending
-            </Link>
-            <Link href="/community" className="text-sm font-sans font-medium text-text-secondary hover:text-accent-gold transition-colors">
+            <Link href="/wishlist" className="text-sm font-sans font-medium text-text-secondary hover:text-accent-gold transition-colors">
               Community
             </Link>
             <Link href="/book-clubs" className="text-sm font-sans font-medium text-text-secondary hover:text-accent-gold transition-colors">
@@ -46,11 +43,6 @@ export function Navbar() {
             <Link href="/search" className="text-sm font-sans font-medium text-text-secondary hover:text-accent-gold transition-colors flex items-center gap-2">
               <Search size={16} /> Search
             </Link>
-            {user && (
-              <Link href="/wishlist" className="text-sm font-sans font-medium text-text-secondary hover:text-accent-gold transition-colors flex items-center gap-2">
-                <Bookmark size={16} /> Wishlist
-              </Link>
-            )}
           </nav>
 
           {/* Desktop Auth Actions */}
@@ -103,15 +95,9 @@ export function Navbar() {
             className="md:hidden bg-bg-secondary w-full border-b border-white/5 absolute top-20 left-0"
           >
             <div className="px-4 pt-4 pb-6 space-y-4 shadow-xl">
-              <Link href="/trending" onClick={() => setIsOpen(false)} className="block text-base font-sans font-medium text-text-secondary hover:text-accent-gold transition-colors">Trending</Link>
-              <Link href="/community" onClick={() => setIsOpen(false)} className="block text-base font-sans font-medium text-text-secondary hover:text-accent-gold transition-colors">Community</Link>
+              <Link href="/wishlist" onClick={() => setIsOpen(false)} className="block text-base font-sans font-medium text-text-secondary hover:text-accent-gold transition-colors">Community</Link>
               <Link href="/book-clubs" onClick={() => setIsOpen(false)} className="block text-base font-sans font-medium text-text-secondary hover:text-accent-gold transition-colors">Book Clubs</Link>
               <Link href="/search" onClick={() => setIsOpen(false)} className="block text-base font-sans font-medium text-text-secondary hover:text-accent-gold transition-colors">Search</Link>
-              {user && (
-                <Link href="/wishlist" onClick={() => setIsOpen(false)} className="block text-base font-sans font-medium text-text-secondary hover:text-accent-gold transition-colors flex items-center gap-2">
-                  <Bookmark size={16} /> Wishlist
-                </Link>
-              )}
 
               <div className="pt-4 border-t border-white/5 space-y-4">
                 {user ? (
